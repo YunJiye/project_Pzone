@@ -1,23 +1,49 @@
 package com.example.project_Pzone;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+
 public class Owner {
-    private String ID;
-    private String PW;
-    private String Token;
+    @JsonIgnore
+    private String ownerID;
+    @JsonIgnore
+    private String ownerPW;
+    private String ownerToken;
+    @JsonIgnore
+    private ArrayList<Integer> parkingLots; // parking lot ids of the owner's
 
     Owner(String ID, String PW, String Token){
-        this.ID = ID;
-        this.PW = PW;
-        this.Token = Token;
+        ownerID = ID;
+        ownerPW = PW;
+        ownerToken = Token;
+        parkingLots = new ArrayList<>();
     }
 
-    public String getID(){
-        return ID;
+    public String getOwnerID(){
+        return ownerID;
     }
-    public String getPW(){
-        return PW;
+    public String getOwnerPW(){
+        return ownerPW;
     }
-    public String getToken(){
-        return Token;
+    public String getOwnerToken(){
+        return ownerToken;
+    }
+
+    public ArrayList<Integer> getParkingLots(){
+        return parkingLots;
+    }
+    public void setOwnerID(String ID){
+        ownerID = ID;
+    }
+    public void setOwnerPW(String PW){
+        ownerPW = PW;
+    }
+    public void setOwnerToken(String token){
+        ownerToken = token;
+    }
+
+    public void setParkingLots(int ID){
+        parkingLots.add(ID);
     }
 }

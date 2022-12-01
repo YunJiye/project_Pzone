@@ -1,8 +1,12 @@
 package com.example.project_Pzone;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 // not owners of parking lots, but users who use this application to find parking lots.
 public class User {
+    @JsonIgnore
     private String userID;
+    @JsonIgnore
     private String userPW;
     private String userToken;
 
@@ -16,11 +20,21 @@ public class User {
         return userID;
     }
 
+    public void setUserID(String ID){
+        userID = ID;
+    }
+
     public String getUserPW(){
         return userPW;
     }
 
-    public String getUserToken(){
-        return userToken;
+    public void setUserPW(String PW){
+        userPW = PW;
+    }
+
+    public Object getUserToken(){ return userToken; }
+
+    public void setUserToken(String token){
+        userToken = token;
     }
 }

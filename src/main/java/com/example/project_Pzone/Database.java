@@ -1,8 +1,14 @@
 package com.example.project_Pzone;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import java.util.ArrayList;
 
+enum FILE_TYPE{NOTHING, CCTV_PICTURE, CCTV_VIDEO, PARKINGLOT_SKETCH, PARKINGLOT_DRAWING};
+
 public final class Database {
+    static int FILE_TYPE_NUM = 5;
     public static boolean stateFlag = false;
     private static int parkingLotID = 0;
     private static ArrayList<User> users;   // only for users who use this application to find parking lots. not owners.
@@ -28,23 +34,39 @@ public final class Database {
     }
 
     // find owner token by id and password.
-    public static String getOwnerToken(String ID, String PW){
+    public static Object getOwnerToken(String ID, String PW){
         for(int i = 0; i < owners.size(); i++){
-            if(owners.get(i).getID() == ID && owners.get(i).getPW() == PW){
-                return owners.get(i).getToken();
+            if(owners.get(i).getOwnerID().equals(ID) && owners.get(i).getOwnerPW().equals(PW)){
+                return owners.get(i);
+            }
+        }
+        return null;
+    }
+
+    public static Owner getOwnerByToken(String token){
+        for(int i = 0; i < owners.size(); i++){
+            if(owners.get(i).getOwnerToken().equals(token)){
+                return owners.get(i);
             }
         }
         return null;
     }
 
     // find user token by id and password. if no user matched, then return null.
-    public static String getUserToken(String ID, String PW){
+    public static Object getUserToken(String ID, String PW){
         for(int i = 0; i < users.size(); i++){
-            if(users.get(i).getUserID() == ID && users.get(i).getUserPW() == PW){
-                return users.get(i).getUserToken();
+            if(users.get(i).getUserID().equals(ID) && users.get(i).getUserPW().equals(PW)){
+                //return users.get(i).getUserToken();
+                return users.get(i);
             }
         }
+        System.out.println("it's not found..ID = "+ID+" PW = "+PW);
         return null;
+    }
+
+    public static FileDto getFileDto(int parkingLotID, int fileType){
+        RegisteredParkingLot RPL = (RegisteredParkingLot)getParkingLotByID(parkingLotID);
+        return RPL.getFileDto(fileType);
     }
 
     public static ArrayList<ParkingLot> getParkingLots(){
@@ -63,14 +85,16 @@ public final class Database {
         owners.add(owner);
     }
 
-    public static void addParkingLots(ParkingLot PL){
-        PL.setID(parkingLotID++);
+    public static void addParkingLots(ParkingLot PL, Owner owner){
+        PL.setID(++parkingLotID);
         parkingLots.add(PL);
+        owner.setParkingLots(parkingLotID);
     }
 
-    public static void addRegisteredParkingLots(RegisteredParkingLot rPL){
-        rPL.setID(parkingLotID++);
+    public static void addRegisteredParkingLots(RegisteredParkingLot rPL, Owner owner){
+        rPL.setID(++parkingLotID);
         registeredParkingLots.add(rPL);
+        owner.setParkingLots(parkingLotID);
     }
 
     public static ParkingLot getParkingLotByID(int ID){

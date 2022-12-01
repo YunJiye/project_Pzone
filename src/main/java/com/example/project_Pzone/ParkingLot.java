@@ -8,8 +8,8 @@ public class ParkingLot {
     protected String name;
     protected String address;
     protected float latitude, longitude;
-    protected int leftSeat = 0;
-    protected int ID; // the number of left seats
+    protected int leftSeat = 0; // the number of left seats
+    protected int ID;
     protected ArrayList<String> carList;
 
     ParkingLot(String client, String name, String address, float latitude, float longitude){

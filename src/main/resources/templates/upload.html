@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>file upload</h1>
+    <form name="form" method="post" action="/upload_file" enctype="multipart/form-data">
+        <h2>file</h2>
+        <input type="file" name="uploadFile" multiple="multiple"/>
+        <h2>parkingLotID</h2>
+        <input type="number" name="parkingLotID"/>
+        <h2>fileType</h2>
+        <input type="number" name="fileType"/>
+        <h2>CCTV ID</h2>
+        <input type="number" name="CCTVID"/>
+        <h6></h6>
+        <input type="submit"/>
+    </form>
+</body>
+</html>

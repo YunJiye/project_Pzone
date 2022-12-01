@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>file list</h1>
+  <u1 th:each="file: ${files}">
+    <li ><span th:text="${file.fileName}"></span>
+    <a href="#" th:href="${'/get_registered_parking_lot_info?parkingLotID='+file.parkingLotID+'&fileType='+file.fileType+'&CCTVID='+file.CCTVID+'&uuid='+file.uuid+'&fileName='+file.fileName}">[download]</a>
+  </u1>
+</body>
+</html>
