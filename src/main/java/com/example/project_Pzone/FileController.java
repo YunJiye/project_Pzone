@@ -157,6 +157,10 @@ public class FileController {
     }
     //public String setParkingInfo(){return "set parking info here";}
 
-
+    // send result file
+    @GetMapping("/get_result")
+    public String getResult(){
+        return "get_result!";
+    }
 }
 

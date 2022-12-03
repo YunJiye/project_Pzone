@@ -91,7 +91,7 @@ public final class Database {
         owner.setParkingLots(parkingLotID);
     }
 
-    public static void addRegisteredParkingLots(RegisteredParkingLot rPL, Owner owner){
+    public static void addRegisteredParkingLots(RegisteredParkingLot rPL, Owner owner) {
         rPL.setID(++parkingLotID);
         registeredParkingLots.add(rPL);
         owner.setParkingLots(parkingLotID);

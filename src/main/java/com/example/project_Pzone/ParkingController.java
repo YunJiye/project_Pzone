@@ -27,7 +27,7 @@ public class ParkingController {
     String filePath;
 
     // set parking lot information(name, address, latitude, longitude)
-    @GetMapping("/set_parking_lot_info")
+    @PostMapping("/set_parking_lot_info")
     public void setParkingLotInfo(@RequestParam("client-name") String client, @RequestParam("name") String name, @RequestParam("address") String address,
                                   @RequestParam("latitude") float latitude, @RequestParam("longitude") float longitude){
         ParkingLot PL = new ParkingLot(client, name, address, latitude, longitude);
@@ -62,8 +62,18 @@ public class ParkingController {
     // get information of vehicle going out - car number(parameter : parkingLot ID, car-number)
     @GetMapping("/provide_going_out_car")
     public void provideGoingOutCar(@RequestParam("ID")int ID, @RequestParam("car-number")String car){
-        RegisteredParkingLot rPL = (RegisteredParkingLot) Database.getParkingLotByID(ID);
+        RegisteredParkingLot rPL = (RegisteredParkingLot)Database.getParkingLotByID(ID);
         Database.deleteCar(rPL, car);
+    }
+
+    @GetMapping("/get_parking_list_by_owner_id")
+    public ArrayList<RegisteredParkingLot> getParkingLotListByOwnerID(@RequestParam("owner")String owner){
+        ArrayList<RegisteredParkingLot> ARP = new ArrayList<>();
+        ArrayList<Integer> own_pl = Database.getOwnerByToken(owner).getParkingLots();
+        for(int i = 0; i < own_pl.size(); i++){
+            ARP.add((RegisteredParkingLot) Database.getParkingLotByID(own_pl.get(i)));
+        }
+        return ARP;
     }
 
     // provide changed state flag - entrance or going out is occurred.
