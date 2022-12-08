@@ -33,11 +33,18 @@ public class FileController {
 
     // download files. show all files in upload folder
     @GetMapping("/download")
-    public ResponseEntity<Resource> Download(@RequestParam("parkingLotID")int parkingLotID, @RequestParam("fileType")int fileType) throws IOException{
-        FileDto dto = Database.getFileDto(parkingLotID, fileType);
+    public ResponseEntity<Resource> Download(@RequestParam("parkingLotID")int parkingLotID, @RequestParam("fileType")int fileType, @RequestParam("section")char section) throws IOException{
+        FileDto dto;
+        if(fileType == FILE_TYPE.CCTV_VIDEO.ordinal() || fileType == FILE_TYPE.CCTV_PICTURE.ordinal()) {
+            dto = Database.getFileDto(parkingLotID, fileType, section);
+        }
+        else{
+            dto = Database.getFileDto(parkingLotID, fileType);
+        }
+
         Path path;
         if(dto.getFileType() == FILE_TYPE.CCTV_PICTURE.ordinal() || dto.getFileType() == FILE_TYPE.CCTV_VIDEO.ordinal())
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getFileName());
+            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
         else
             path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
 
@@ -55,7 +62,7 @@ public class FileController {
     public ResponseEntity<Resource> getRegisteredParkingLotInfo(@ModelAttribute FileDto dto) throws IOException{
         Path path;
         if(dto.getFileType() == FILE_TYPE.CCTV_PICTURE.ordinal() || dto.getFileType() == FILE_TYPE.CCTV_VIDEO.ordinal())
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getFileName());
+            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
         else
             path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
 
@@ -76,16 +83,17 @@ public class FileController {
     }
 
     @PostMapping("/upload_file")
-    public String uploadFile(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("fileType") int fileType, @RequestParam("CCTVID")int CCTVID, Model model) throws IOException {
+    public String uploadFile(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("fileType") int fileType, @RequestParam("CCTVID")int CCTVID, @RequestParam("section")char section, Model model) throws IOException {
         List<FileDto> list = new ArrayList<>();
         for(MultipartFile file : uploadFile){
             if(!file.isEmpty()){
                 FileDto dto = new FileDto(UUID.randomUUID().toString(), file.getOriginalFilename(), file.getContentType(), parkingLotID, fileType);
                 dto.setCCTVID(CCTVID);
+                dto.setSection(section);
                 list.add(dto);
                 File newFileName;
                 if(fileType == FILE_TYPE.CCTV_PICTURE.ordinal() || fileType == FILE_TYPE.CCTV_VIDEO.ordinal()){
-                    newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getFileName());
+                    newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
                 }
                 else {
                     newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
@@ -101,7 +109,9 @@ public class FileController {
                 rPL=new RegisteredParkingLot("a","b","c",1,2);
                 Database.addRegisteredParkingLots(rPL);*/
 
-                rPL.addFile(fileType, dto);
+                if(fileType == FILE_TYPE.CCTV_PICTURE.ordinal() || fileType == FILE_TYPE.CCTV_VIDEO.ordinal())
+                    rPL.addFile(fileType, section, dto);
+                else rPL.addFile(fileType, dto);
             }
         }
         model.addAttribute("files", list);
@@ -112,14 +122,15 @@ public class FileController {
 
     // get cctv information - every 2 seconds, cctv screen, and its number
     @PostMapping("/upload_cctv_info")
-    public void uploadCCTVInfo(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("CCTVID") int CCTVID, Model model) throws IOException {
+    public void uploadCCTVInfo(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("CCTVID") int CCTVID, @RequestParam("section")char section, Model model) throws IOException {
         List<FileDto> list = new ArrayList<>();
         for(MultipartFile file : uploadFile){
             if(!file.isEmpty()){
                 FileDto dto = new FileDto(UUID.randomUUID().toString(), file.getOriginalFilename(), file.getContentType(), parkingLotID, FILE_TYPE.CCTV_PICTURE.ordinal());
                 dto.setCCTVID(CCTVID);
+                dto.setSection(section);
                 list.add(dto);
-                File newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getFileName());
+                File newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
                 // store file
                 file.transferTo(newFileName);
 
@@ -127,7 +138,7 @@ public class FileController {
                 RegisteredParkingLot rPL = (RegisteredParkingLot)(Database.getParkingLotByID(parkingLotID));
                 if(rPL == null) System.out.println("upload file error!!rPL not exist!!\n");
 
-                rPL.addFile(FILE_TYPE.CCTV_PICTURE.ordinal(), dto);
+                rPL.addFile(FILE_TYPE.CCTV_PICTURE.ordinal(), section, dto);
             }
         }
         model.addAttribute("files", list);
@@ -159,8 +170,16 @@ public class FileController {
 
     // send result file
     @GetMapping("/get_result")
-    public String getResult(){
-        return "get_result!";
+    public ResponseEntity<Resource> getResult(@RequestParam("ID")int ID) throws IOException{
+        FileDto dto = Database.getFileDto(ID, FILE_TYPE.PARKINGLOT_SKETCH.ordinal());
+        Path path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
+
+        String contentType = Files.probeContentType(path);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(dto.getFileName(), StandardCharsets.UTF_8).build());
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+        Resource resource = new InputStreamResource(Files.newInputStream(path));
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 }
 

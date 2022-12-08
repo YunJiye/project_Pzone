@@ -14,6 +14,7 @@ public class FileDto {
     private int parkingLotID;   // unique ID of each parking lots.
     private int fileType;
     private int CCTVID; // if it's a file of cctv, then you have to set cctv id.
+    private char section;    // section of parking lot. A ~ Z
 
     public FileDto(String uuid, String fileName, String contentType, int parkingLotID, int fileType){
         this.uuid = uuid;
@@ -22,6 +23,7 @@ public class FileDto {
         this.parkingLotID = parkingLotID;
         this.fileType = fileType;
         CCTVID = 0; // default value
+        section = 'A';    // default value
         //System.out.println(contentType);
     }
 
@@ -49,6 +51,10 @@ public class FileDto {
         return CCTVID;
     }
 
+    public char getSection(){
+        return section;
+    }
+
     public void setUuid(String uuid){
         this.uuid = uuid;
     }
@@ -71,6 +77,10 @@ public class FileDto {
 
     public void setCCTVID(int cctvid){
         CCTVID = cctvid;
+    }
+
+    public void setSection(char sectionChar){
+        section = sectionChar;
     }
 
 }

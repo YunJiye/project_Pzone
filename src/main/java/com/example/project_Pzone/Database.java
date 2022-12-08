@@ -3,6 +3,9 @@ package com.example.project_Pzone;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 enum FILE_TYPE{NOTHING, CCTV_PICTURE, CCTV_VIDEO, PARKINGLOT_SKETCH, PARKINGLOT_DRAWING};
@@ -17,12 +20,18 @@ public final class Database {
     private static ArrayList<RegisteredParkingLot> registeredParkingLots;
 
 
-    public static void init(){
+    public static void init() throws FileNotFoundException {
         owners = new ArrayList<>();
         users = new ArrayList();
         parkingLots = new ArrayList();
         registeredParkingLots = new ArrayList();
         parkingLotID = 0;
+
+        // get information from files.
+        /*File file = new File("파일경로");
+        FileReader fileReader1 = new FileReader(file);
+
+        FileReader fileReader2 = new FileReader("파일경로");*/
     }
 
     public static ArrayList<Owner> getOwners(){
@@ -67,6 +76,10 @@ public final class Database {
     public static FileDto getFileDto(int parkingLotID, int fileType){
         RegisteredParkingLot RPL = (RegisteredParkingLot)getParkingLotByID(parkingLotID);
         return RPL.getFileDto(fileType);
+    }
+    public static FileDto getFileDto(int parkingLotID, int fileType, char section){
+        RegisteredParkingLot RPL = (RegisteredParkingLot)getParkingLotByID(parkingLotID);
+        return RPL.getFileDto(fileType, section);
     }
 
     public static ArrayList<ParkingLot> getParkingLots(){
