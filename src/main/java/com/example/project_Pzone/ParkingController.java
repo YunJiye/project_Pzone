@@ -29,9 +29,10 @@ public class ParkingController {
     // set parking lot information(name, address, latitude, longitude)
     @PostMapping("/set_parking_lot_info")
     public void setParkingLotInfo(@RequestParam("client-name") String client, @RequestParam("name") String name, @RequestParam("address") String address,
-                                  @RequestParam("latitude") float latitude, @RequestParam("longitude") float longitude){
+                                  @RequestParam("latitude") float latitude, @RequestParam("longitude") float longitude) throws IOException {
         ParkingLot PL = new ParkingLot(client, name, address, latitude, longitude);
-        Database.getParkingLots().add(PL);
+        //Database.getParkingLots().add(PL);
+        Database.addParkingLots(PL, Database.getOwnerByToken(client));
     }
     //public String setParking_lot_info(){return "set parking info here";}
 
@@ -39,6 +40,11 @@ public class ParkingController {
     @GetMapping("/get_all_parking_lot_info")
     public ArrayList<ParkingLot> getAllParkingInfo(){
         return Database.getParkingLots();
+    }
+
+    @GetMapping("/get_all_registered_parking_lot_info")
+    public ArrayList<RegisteredParkingLot> getAllRegisteredParkingInfo(){
+        return Database.getRegisteredParkingLots();
     }
 
     // provide parking lot information of the parking lot
@@ -54,14 +60,14 @@ public class ParkingController {
 
     // get information of vehicle entering the entrance - car number and parking lot
     @GetMapping("/provide_entering_car")
-    public void provideEnteringCar(@RequestParam("ID")int ID, @RequestParam("car-number")String car){
+    public void provideEnteringCar(@RequestParam("ID")int ID, @RequestParam("car-number")String car) throws IOException {
         RegisteredParkingLot rPL = (RegisteredParkingLot) Database.getParkingLotByID(ID);
         Database.addCar(rPL, car);
     }
 
     // get information of vehicle going out - car number(parameter : parkingLot ID, car-number)
     @GetMapping("/provide_going_out_car")
-    public void provideGoingOutCar(@RequestParam("ID")int ID, @RequestParam("car-number")String car){
+    public void provideGoingOutCar(@RequestParam("ID")int ID, @RequestParam("car-number")String car) throws IOException {
         RegisteredParkingLot rPL = (RegisteredParkingLot)Database.getParkingLotByID(ID);
         Database.deleteCar(rPL, car);
     }

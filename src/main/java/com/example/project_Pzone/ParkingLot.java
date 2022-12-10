@@ -10,7 +10,7 @@ public class ParkingLot {
     protected float latitude, longitude;
     protected int leftSeat = 0; // the number of left seats
     protected int ID;
-    protected ArrayList<String> carList;
+    protected ArrayList<String> carList;    // not used in this class, in registered parking lot.
 
     ParkingLot(String client, String name, String address, float latitude, float longitude){
         this.client = client;
@@ -24,6 +24,7 @@ public class ParkingLot {
     public void setID(int ID) {
         this.ID = ID;
     }
+    public void setLeftSeat(int leftSeat){this.leftSeat = leftSeat;}
 
     public int getID(){
         return ID;

@@ -8,7 +8,7 @@ package com.example.project_Pzone;
     4 : parking lot drawing => 도면
 */
 public class FileDto {
-    private String uuid;    // to make unique name => stored file name : uuid_fileName
+    //private String uuid;    // to make unique name => stored file name : uuid_fileName
     private String fileName;
     private String contentType;
     private int parkingLotID;   // unique ID of each parking lots.
@@ -16,8 +16,8 @@ public class FileDto {
     private int CCTVID; // if it's a file of cctv, then you have to set cctv id.
     private char section;    // section of parking lot. A ~ Z
 
-    public FileDto(String uuid, String fileName, String contentType, int parkingLotID, int fileType){
-        this.uuid = uuid;
+    public FileDto(String fileName, String contentType, int parkingLotID, int fileType){
+        //this.uuid = uuid;
         this.fileName = fileName;
         this.contentType = contentType;
         this.parkingLotID = parkingLotID;
@@ -25,11 +25,12 @@ public class FileDto {
         CCTVID = 0; // default value
         section = 'A';    // default value
         //System.out.println(contentType);
+        //System.out.println("fileName = " + fileName + " contentType = " + contentType + " parkingLotID = " + parkingLotID + " fileType = " + fileType );
     }
 
-    public String getUuid() {
+    /*public String getUuid() {
         return uuid;
-    }
+    }*/
 
     public String getContentType() {
         return contentType;
@@ -55,9 +56,9 @@ public class FileDto {
         return section;
     }
 
-    public void setUuid(String uuid){
+    /*public void setUuid(String uuid){
         this.uuid = uuid;
-    }
+    }*/
 
     public void setFileName(String fileName){
         this.fileName = fileName;

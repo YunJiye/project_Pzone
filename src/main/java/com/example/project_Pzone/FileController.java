@@ -25,9 +25,9 @@ import java.util.*;
 //@RestController
 @Controller
 public class FileController {
-    @Value("${spring.servlet.multipart.location}")
+    /*@Value("${spring.servlet.multipart.location}")
     //@Value("${file.dir}")
-    String filePath;
+    String filePath;*/
 
 // download files by parkingLotID and file type
 
@@ -43,11 +43,15 @@ public class FileController {
         }
 
         Path path;
+        FileIO fileIO = new FileIO(dto.getParkingLotID(), dto.getFileType());
         if(dto.getFileType() == FILE_TYPE.CCTV_PICTURE.ordinal() || dto.getFileType() == FILE_TYPE.CCTV_VIDEO.ordinal())
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
+            path = Paths.get(fileIO.getFilePath() + "/" + dto.getFileName());
         else
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
-
+            path = Paths.get(fileIO.getFilePath() +  "/" + dto.getFileName());
+        if(!Files.exists(path)) {
+            System.out.println("error..here...");
+            return null;
+        }
         String contentType = Files.probeContentType(path);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment").filename(dto.getFileName(), StandardCharsets.UTF_8).build());
@@ -59,13 +63,15 @@ public class FileController {
 // For download Test!
     // provide registered parking lot information - registered parking lot drawing, parkingLot ID and CCTV number
     @GetMapping("/get_registered_parking_lot_info")
+    @ResponseBody
     public ResponseEntity<Resource> getRegisteredParkingLotInfo(@ModelAttribute FileDto dto) throws IOException{
         Path path;
+        FileIO fileIO = new FileIO(dto.getParkingLotID(), dto.getFileType());
         if(dto.getFileType() == FILE_TYPE.CCTV_PICTURE.ordinal() || dto.getFileType() == FILE_TYPE.CCTV_VIDEO.ordinal())
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
+            path = Paths.get(fileIO.getFilePath() + "/" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
         else
-            path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
-
+            path = Paths.get(fileIO.getFilePath() + "/" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
+        if(!Files.exists(path)) return null;
         String contentType = Files.probeContentType(path);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment").filename(dto.getFileName(), StandardCharsets.UTF_8).build());
@@ -83,20 +89,28 @@ public class FileController {
     }
 
     @PostMapping("/upload_file")
+    @ResponseBody
     public String uploadFile(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("fileType") int fileType, @RequestParam("CCTVID")int CCTVID, @RequestParam("section")char section, Model model) throws IOException {
         List<FileDto> list = new ArrayList<>();
         for(MultipartFile file : uploadFile){
             if(!file.isEmpty()){
-                FileDto dto = new FileDto(UUID.randomUUID().toString(), file.getOriginalFilename(), file.getContentType(), parkingLotID, fileType);
+                FileDto dto = new FileDto(file.getOriginalFilename(), file.getContentType(), parkingLotID, fileType);
                 dto.setCCTVID(CCTVID);
                 dto.setSection(section);
                 list.add(dto);
                 File newFileName;
+                FileIO fileIO = new FileIO(dto.getParkingLotID(), dto.getFileType());
                 if(fileType == FILE_TYPE.CCTV_PICTURE.ordinal() || fileType == FILE_TYPE.CCTV_VIDEO.ordinal()){
-                    newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
+                    // if already exist, delete it and add new file!
+                    String tempPath = fileIO.getFilePath() + "/" + dto.getFileName();
+                    Files.deleteIfExists(Paths.get(tempPath));
+                    newFileName = new File(fileIO.getFilePath() + "/" + dto.getFileName());
                 }
                 else {
-                    newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
+                    // if already exist, delete it and add new file!
+                    String tempPath = fileIO.getFilePath() + "/" + dto.getFileName();
+                    Files.deleteIfExists(Paths.get(tempPath));
+                    newFileName = new File(fileIO.getFilePath() + "/" + dto.getFileName());
                 }
 
                 // store file
@@ -122,15 +136,21 @@ public class FileController {
 
     // get cctv information - every 2 seconds, cctv screen, and its number
     @PostMapping("/upload_cctv_info")
+    @ResponseBody
     public void uploadCCTVInfo(@RequestParam("uploadFile") MultipartFile[] uploadFile, @RequestParam("parkingLotID") int parkingLotID, @RequestParam("CCTVID") int CCTVID, @RequestParam("section")char section, Model model) throws IOException {
         List<FileDto> list = new ArrayList<>();
         for(MultipartFile file : uploadFile){
             if(!file.isEmpty()){
-                FileDto dto = new FileDto(UUID.randomUUID().toString(), file.getOriginalFilename(), file.getContentType(), parkingLotID, FILE_TYPE.CCTV_PICTURE.ordinal());
+                FileDto dto = new FileDto(file.getOriginalFilename(), file.getContentType(), parkingLotID, FILE_TYPE.CCTV_PICTURE.ordinal());
                 dto.setCCTVID(CCTVID);
                 dto.setSection(section);
                 list.add(dto);
-                File newFileName = new File(dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getCCTVID() + "_" + dto.getSection() + "_" + dto.getFileName());
+                FileIO fileIO = new FileIO(dto.getParkingLotID(), dto.getFileType());
+                // if already exist, delete it and add new file!
+                String tempPath = fileIO.getFilePath() + "/" + dto.getFileName();
+                Files.deleteIfExists(Paths.get(tempPath));
+
+                File newFileName = new File(fileIO.getFilePath() + "/" + dto.getFileName());
                 // store file
                 file.transferTo(newFileName);
 
@@ -147,6 +167,7 @@ public class FileController {
 
     // Parking lot information registration - additionally, parking lot CCTV location and drawing
     @PostMapping("/parking_lot_registration")
+    @ResponseBody
     public void setParkingLotRegistration(@RequestParam("owner_id") String owner, @RequestParam("name") String name, @RequestParam("address") String address,
                                           @RequestParam("latitude") float latitude, @RequestParam("longitude") float longitude,
                                           @RequestParam("uploadFile") MultipartFile[] uploadFile, Model model) throws IOException {
@@ -155,13 +176,18 @@ public class FileController {
         List<FileDto> list = new ArrayList<>();
         for(MultipartFile file : uploadFile){
             if(!file.isEmpty()){
-                FileDto dto = new FileDto(UUID.randomUUID().toString(), file.getOriginalFilename(), file.getContentType(), rPL.getID(), FILE_TYPE.PARKINGLOT_DRAWING.ordinal());
+                FileIO fileIO = new FileIO(rPL.getID(), FILE_TYPE.PARKINGLOT_DRAWING.ordinal());
+                // if already exist, delete it and add new file!
+                String tempPath = fileIO.getFilePath() + "/" + file.getOriginalFilename();
+                Files.deleteIfExists(Paths.get(tempPath));
+
+                FileDto dto = new FileDto(file.getOriginalFilename(), file.getContentType(), rPL.getID(), FILE_TYPE.PARKINGLOT_DRAWING.ordinal());
                 list.add(dto);
-                File newFileName = new File(dto.getUuid() + "_" + rPL.getID() + "_"+ FILE_TYPE.PARKINGLOT_DRAWING.ordinal() + "_" + dto.getFileName());
+                File newFileName = new File(tempPath);
                 // store file
                 file.transferTo(newFileName);
                 // add to database
-                rPL.addFile(FILE_TYPE.CCTV_PICTURE.ordinal(), dto);
+                rPL.addFile(FILE_TYPE.PARKINGLOT_DRAWING.ordinal(), dto);
             }
         }
         model.addAttribute("files", list);
@@ -170,9 +196,14 @@ public class FileController {
 
     // send result file
     @GetMapping("/get_result")
+    @ResponseBody
     public ResponseEntity<Resource> getResult(@RequestParam("ID")int ID) throws IOException{
         FileDto dto = Database.getFileDto(ID, FILE_TYPE.PARKINGLOT_SKETCH.ordinal());
-        Path path = Paths.get(filePath + "/" + dto.getUuid() + "_" + dto.getParkingLotID() + "_" + dto.getFileType() + "_" + dto.getFileName());
+        Path path = Paths.get(Database.filePath + "/" + "registered_parking_lot" + "/"+ dto.getParkingLotID() + "/" + dto.getFileType() + "/" + dto.getFileName());
+        if(!Files.exists(path)) {
+            System.out.println("path = "+"the file not exists, so terminated.");
+            return null;
+        }
 
         String contentType = Files.probeContentType(path);
         HttpHeaders headers = new HttpHeaders();

@@ -2,6 +2,8 @@ package com.example.project_Pzone;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 public class LoginController {
     // show user info - will be found by ID and Password?
@@ -12,7 +14,7 @@ public class LoginController {
 
     // store tokens for users
     @PostMapping("/set_user")
-    public void setUser(@RequestParam("ID")String ID, @RequestParam("PW")String PW, @RequestParam("token")String token){
+    public void setUser(@RequestParam("ID")String ID, @RequestParam("PW")String PW, @RequestParam("token")String token) throws IOException {
         User user = new User(ID, PW, token);
         Database.addUsers(user);
     }
@@ -25,7 +27,7 @@ public class LoginController {
 
     // store tokens for owners
     @PostMapping("/set_owner")
-    public void setOwner(@RequestParam("ID")String ID, @RequestParam("PW")String PW, @RequestParam("token")String token){
+    public void setOwner(@RequestParam("ID")String ID, @RequestParam("PW")String PW, @RequestParam("token")String token) throws IOException {
         Owner owner = new Owner(ID, PW, token);
         Database.addOwners(owner);
     }

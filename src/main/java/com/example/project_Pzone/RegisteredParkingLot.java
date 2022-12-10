@@ -13,6 +13,8 @@ public class RegisteredParkingLot extends ParkingLot{
         super(client, name, address, latitude, longitude);
         cars = new ArrayList<>();
         fileDtos = new ArrayList<>();
+        videoFileDtos = new ArrayList<>();
+        pictureFileDtos = new ArrayList<>();
         for(int i = 0; i < 5; i++)
             fileDtos.add(0, null);  // 1~2 not used.
         for(int i = 0; i < 26; i++){
@@ -31,10 +33,10 @@ public class RegisteredParkingLot extends ParkingLot{
     }
     public void addFile(int fileType, char section, FileDto fileDto){
         if(fileType == 1){  // CCTV picture
-            pictureFileDtos.set(section, fileDto);
+            pictureFileDtos.set(section-'A', fileDto);
         }
         else{   // CCTV video
-            videoFileDtos.set(section, fileDto);
+            videoFileDtos.set(section-'A', fileDto);
         }
     }
 
@@ -43,10 +45,10 @@ public class RegisteredParkingLot extends ParkingLot{
     }
     public FileDto getFileDto(int fileType, char section){
         if(fileType == 1){  // CCTV picture
-            return pictureFileDtos.get(section);
+            return pictureFileDtos.get(section-'A');
         }
         else {  // CCTV video
-            return videoFileDtos.get(section);
+            return videoFileDtos.get(section-'A');
         }
     }
 
@@ -64,5 +66,9 @@ public class RegisteredParkingLot extends ParkingLot{
                 break;
             }
         }
+    }
+
+    public ArrayList<Car> getCars(){
+        return cars;
     }
 }
