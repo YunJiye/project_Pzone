@@ -1,0 +1,12 @@
+names:
+- '0'
+- '1'
+nc: 2
+roboflow:
+  license: CC BY 4.0
+  project: park_aug_aug_v7
+  url: https://universe.roboflow.com/testpr3-2tk7v/park_aug_aug_v7/dataset/2
+  version: 2
+  workspace: testpr3-2tk7v
+train: /content/train.txt
+val: /content/valid.txt
