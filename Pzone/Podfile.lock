@@ -1,0 +1,40 @@
+PODS:
+  - Alamofire (5.6.2)
+  - BSImagePicker (3.3.1)
+  - naveridlogin-sdk-ios (4.1.5)
+  - NMapsMap (3.16.0)
+  - Socket.IO-Client-Swift (16.0.1):
+    - Starscream (~> 4.0)
+  - Starscream (4.0.4)
+  - SwiftyJSON (4.3.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - BSImagePicker (~> 3.1)
+  - naveridlogin-sdk-ios
+  - NMapsMap
+  - Socket.IO-Client-Swift
+  - SwiftyJSON (~> 4.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - BSImagePicker
+    - naveridlogin-sdk-ios
+    - NMapsMap
+    - Socket.IO-Client-Swift
+    - Starscream
+    - SwiftyJSON
+
+SPEC CHECKSUMS:
+  Alamofire: d368e1ff8a298e6dde360e35a3e68e6c610e7204
+  BSImagePicker: 0fe04b574d4d6b81093785d2af6c26227efc8428
+  naveridlogin-sdk-ios: 4351fe7162cd6b8b6dbb37bd7cc205304fa1d889
+  NMapsMap: a2593320fca2bb09e521c05b4dffee4da42e96ed
+  Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
+  Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
+  SwiftyJSON: 6faa0040f8b59dead0ee07436cbf76b73c08fd08
+
+PODFILE CHECKSUM: 1fe33741665c98b474e302f0382d7822dee6a5a1
+
+COCOAPODS: 1.11.3
